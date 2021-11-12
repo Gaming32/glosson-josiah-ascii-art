@@ -23,20 +23,66 @@ public class GlossonJosiahASCIIArt {
         }
         newLine();
 
-        printBuilding(floorCount);
+        final boolean[][] floors = printBuilding(floorCount);
+        animateBulding(floors);
+    }
+
+    static void animateBulding(final boolean[][] floors) {
+        while (true) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                break;
+            }
+            int floor = ThreadLocalRandom.current().nextInt(floors.length);
+            animateFloor(floor, floors);
+        }
+    }
+
+    static void animateFloor(int floor, boolean[][] floors) {
+        boolean[] floorData = floors[floor];
+        int up = floors.length - floor + 1;
+        ansiEscape("A", up);
+        floorData[3] = !floorData[3];
+        int color = floorData[3] ? 43 : 0;
+        for (int i = 0; i < 3; i++) {
+            ansiEscape("C", 3);
+            if (floorData[i]) {
+                ansiEscape("m", color);
+                print("\u00af");
+            } else {
+                ansiEscape("C", 1);
+            }
+        }
+        ansiEscape("D", 1000);
+        ansiEscape("B", up);
+    }
+
+    static void ansiEscape(String escape, int... args) {
+        StringBuilder code = new StringBuilder("\u001b[");
+        if (args.length > 0) {
+            code.append(args[0]);
+            for (int i = 1; i < args.length; i++) {
+                code.append(";");
+                code.append(args[i]);
+            }
+        }
+        code.append(escape);
+        print(code.toString());
     }
 
     /**
      * Prints an ASCII art building
      * @param floorCount The number of floors in the building
      */
-    static void printBuilding(final int floorCount) {
+    static boolean[][] printBuilding(final int floorCount) {
         header();
-        boolean[][] floors = new boolean[floorCount][3];
+        final boolean[][] floors = new boolean[floorCount][4];
         for (int i = 0; i < floorCount; i++) {
             printFloor(i, floors);
         }
         footer();
+        return floors;
     }
 
     /**
