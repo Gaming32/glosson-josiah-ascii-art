@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class GlossonJosiahASCIIArt {
     public static void main(String[] args) {
         int floorCount;
+        boolean animate;
 
         // Ask the user for the number of floors
         // (17 is required for 400 characters)
@@ -24,10 +25,16 @@ public class GlossonJosiahASCIIArt {
         newLine();
 
         final boolean[][] floors = printBuilding(floorCount);
-        animateBulding(floors);
+
+        System.out.print("Do you want the building to be animated? (default: false) ");
+        animate = Boolean.parseBoolean(scanner.nextLine());
+        if (animate) {
+            animateBulding(floors);
+        }
     }
 
     static void animateBulding(final boolean[][] floors) {
+        ansiEscape("D", 1000);
         while (true) {
             try {
                 Thread.sleep(1000);
@@ -41,7 +48,7 @@ public class GlossonJosiahASCIIArt {
 
     static void animateFloor(int floor, boolean[][] floors) {
         boolean[] floorData = floors[floor];
-        int up = floors.length - floor + 1;
+        int up = floors.length - floor + 2;
         ansiEscape("A", up);
         floorData[3] = !floorData[3];
         int color = floorData[3] ? 43 : 0;
